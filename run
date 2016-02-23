@@ -1,0 +1,13 @@
+#!/bin/bash
+
+MICRO_BRIDGE_CONTAINER=$(docker ps -a | grep micro-bridge | awk '{print $NF}')
+
+if [ "$MICRO_BRIDGE_CONTAINER" = "micro-bridge" ]; then
+	docker start micro-bridge
+else
+	mkdir -p $HOME/app/web/log/nginx $HOME/app/web/log/mongodb
+	docker run  -d -p 80:80 -p 27017:27017 \
+    -v $HOME/app/web/:/var/www \
+    -v $HOME/app/web/log/:/var/log \
+    --name micro-bridge micro-bridge
+fi
