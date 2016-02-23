@@ -1,0 +1,1 @@
+* * * * * php /app/channelbridge/elevenia/artisan schedule:run >> /dev/null 2>&1

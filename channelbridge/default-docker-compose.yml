@@ -1,0 +1,32 @@
+nginx:
+  image: acomcm/centos-nginx
+  ports:
+    - 80:80
+    - 443:443
+  volumes:
+    - ./config/nginx/sites:/etc/nginx/sites
+    - ~/app/decode-zero/app/php56/www:/app/web
+  links:
+    - default_web
+
+default_web:
+  image: acomcm/centos-php56
+  volumes:
+    - ~/app/decode-zero/app/php56/www:/app/web
+    - ./config/php56/www.conf:/etc/php-fpm.d/www.conf
+
+elevenia_channel:
+  image: acomcm/centos-php56
+  volumes:
+    - ~/app/decode-zero/app/php56/www/acommerce/channelbridge/elevenia:/app/channelbridge/elevenia
+    - ./config/supervisor/elevenia_channel_worker.ini:/etc/supervisord.d/elevenia_channel_worker.ini
+    - ./config/crontab/elevenia_channel_cron:/crontab/elevenia_channel_cron
+  extra_hosts:
+    - api.elevenia.co.id:112.215.119.91
+    - mongo.acommercedev.platform:10.1.1.90
+  command: bash -c "crontab /crontab/elevenia_channel_cron && supervisord -n"
+  links:
+    - redis_server
+
+redis_server:
+  image: acomcm/centos-redis
